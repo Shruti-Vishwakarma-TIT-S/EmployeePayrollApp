@@ -45,4 +45,17 @@ public class EmployeeController {
     public EmployeeEntity updateEmployee(@PathVariable Long id, @RequestBody EmployeeEntity newEmployee) {
         return employeeService.updateEmployee(id, newEmployee);
     }
+
+    // UC2 -------------------------------- starts here
+    // Get employees by department
+    @GetMapping("/department/{department}")
+    public List<EmployeeEntity> getEmployeesByDepartment(@PathVariable String department) {
+        return employeeService.getEmployeesByDepartment(department);
+    }
+
+    // Update employee's salary
+    @PatchMapping("/{id}/salary")
+    public EmployeeEntity updateEmployeeSalary(@PathVariable Long id, @RequestBody double newSalary) {
+        return employeeService.updateEmployeeSalary(id, newSalary);
+    }
 }

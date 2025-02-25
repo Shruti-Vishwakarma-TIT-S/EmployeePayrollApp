@@ -45,4 +45,17 @@ public class EmployeeService {
                 });
 
     }
+
+    // UC2 --------------------------------- starts here
+    public List<EmployeeEntity> getEmployeesByDepartment(String department) {
+        return repository.findByDepartment(department);
+    }
+
+    public EmployeeEntity updateEmployeeSalary(Long id, double newSalary) {
+        return repository.findById(id)
+                .map(employee -> {
+                    employee.setSalary(newSalary);
+                    return repository.save(employee);
+                }).orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
 }
