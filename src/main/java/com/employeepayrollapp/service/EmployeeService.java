@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+// UC2- service Layer is added according to this question
+
 @Service
 public class EmployeeService {
 
