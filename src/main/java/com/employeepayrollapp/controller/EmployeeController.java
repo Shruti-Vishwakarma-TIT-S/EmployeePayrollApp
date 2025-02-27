@@ -1,61 +1,62 @@
 package com.employeepayrollapp.controller;
 
+import com.employeepayrollapp.dto.EmployeeDTO;
 import com.employeepayrollapp.entity.EmployeeEntity;
 import com.employeepayrollapp.service.EmployeeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/employees")
+@RequestMapping("/api")
 public class EmployeeController {
 
-    // UC-1 -------------------------------- starts here
+    // UC1 - DTO ----------------------------- starts here
+
+    public static final Logger logger= LoggerFactory.getLogger(EmployeeController.class);
+
     @Autowired
-    private EmployeeService employeeService;
-
-    // To add new data
+    public EmployeeService employeeService;
     @PostMapping
-    public EmployeeEntity addEmployee(@RequestBody EmployeeEntity employee) {
-        return employeeService.saveEmployee(employee);
+    public ResponseEntity<?> addEmployees(@RequestBody EmployeeDTO employee){
+        logger.info("Adding a new employee: {}", employee.getName());
+        EmployeeEntity saveEmployee= employeeService.saveEmployees(employee);
+        return ResponseEntity.ok(new EmployeeDTO(saveEmployee));
     }
-
-    // To retrieve data
     @GetMapping
-    public List<EmployeeEntity> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public ResponseEntity<List<EmployeeEntity>> getAllEmployees(){
+        logger.info("Get all employee details");
+        List<EmployeeEntity> getEmployees=  employeeService.getAllEmployees();
+        List<EmployeeDTO> getEmployeeDetails= new ArrayList<>();
+        for(EmployeeEntity entity: getEmployees){
+            getEmployeeDetails.add(new EmployeeDTO(entity));
+        }
+        return ResponseEntity.ok(getEmployees);
     }
-
-    // To retrieve data based on id
     @GetMapping("/{id}")
-    public Optional<EmployeeEntity> getEmployeeById(@PathVariable Long id) {
-        return employeeService.getEmployeeById(id);
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+        logger.info("Get employee details by id: {}", id);
+        Optional<EmployeeEntity> getEmployee = employeeService.getEmployeeById(id);
+        if(getEmployee.isPresent()){
+            return ResponseEntity.ok(new EmployeeDTO(getEmployee.get()));
+        }
+        return ResponseEntity.notFound().build();
     }
-
-    // To delete data based on id
     @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<EmployeeDTO> deleteEmployee(@PathVariable Long id){
+        logger.info("Delete employee.");
         employeeService.deleteEmployee(id);
+        return ResponseEntity.noContent().build();
     }
-
-    // Update the changes in the file data
     @PutMapping("/{id}")
-    public EmployeeEntity updateEmployee(@PathVariable Long id, @RequestBody EmployeeEntity newEmployee) {
-        return employeeService.updateEmployee(id, newEmployee);
-    }
-
-    // UC2 -------------------------------- starts here
-    // Get employees by department
-    @GetMapping("/department/{department}")
-    public List<EmployeeEntity> getEmployeesByDepartment(@PathVariable String department) {
-        return employeeService.getEmployeesByDepartment(department);
-    }
-
-    // Update employee's salary
-    @PatchMapping("/{id}/salary")
-    public EmployeeEntity updateEmployeeSalary(@PathVariable Long id, @RequestBody double newSalary) {
-        return employeeService.updateEmployeeSalary(id, newSalary);
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO){
+        logger.info("Updated employee details.");
+        EmployeeEntity updateEmployee= employeeService.updateEmployee(id, employeeDTO);
+        return ResponseEntity.ok(new EmployeeDTO(updateEmployee));
     }
 }

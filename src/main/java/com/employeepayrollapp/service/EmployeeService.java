@@ -1,61 +1,55 @@
 package com.employeepayrollapp.service;
 
+import com.employeepayrollapp.dto.EmployeeDTO;
 import com.employeepayrollapp.entity.EmployeeEntity;
 import com.employeepayrollapp.repository.EmployeeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EmployeeService {
 
-    // Used for dependency injection
-
+    // UC1-DTO ---------------------------- starts here
+    public static final Logger logger= LoggerFactory.getLogger(EmployeeService.class);
+    //dependency injection
     @Autowired
-    private EmployeeRepository repository;
+    public EmployeeRepository employeeRepository;
+    //save employees
+    public EmployeeEntity saveEmployees(EmployeeDTO employee){
+        EmployeeEntity emp = new EmployeeEntity();
+        emp.setName(employee.getName());
+        emp.setSalary(employee.getSalary());
+        logger.info("Saving employee: {}", employee.getName());
 
-    public EmployeeEntity saveEmployee(EmployeeEntity employee) {
-        return repository.save(employee);
+        return employeeRepository.save(emp);
     }
-
-    public List<EmployeeEntity> getAllEmployees() {
-        return repository.findAll();
+    //list of employees
+    public List<EmployeeEntity> getAllEmployees(){
+        logger.info("Getting all employees");
+        return employeeRepository.findAll();
     }
-
-    public Optional<EmployeeEntity> getEmployeeById(Long id) {
-        return repository.findById(id);
+    public Optional<EmployeeEntity> getEmployeeById(Long id){
+        logger.info("Get employee details by id: {}", id);
+        return employeeRepository.findById(id);
     }
-
-    public void deleteEmployee(Long id) {
-        repository.deleteById(id);
+    public void deleteEmployee(Long id){
+        logger.info("Delete employee.");
+        employeeRepository.deleteById(id);
     }
-
-    public EmployeeEntity updateEmployee(Long id, EmployeeEntity newEmployee) {
-        return repository.findById(id)
-                .map(employee -> {
-                    employee.setName(newEmployee.getName());
-                    employee.setDepartment(newEmployee.getDepartment());
-                    employee.setSalary(newEmployee.getSalary());
-                    return repository.save(employee);
-                })
-                .orElseGet(() -> {
-                    newEmployee.setId(id);
-                    return repository.save(newEmployee);
-                });
-
-    }
-
-    // UC2 --------------------------------- starts here
-    public List<EmployeeEntity> getEmployeesByDepartment(String department) {
-        return repository.findByDepartment(department);
-    }
-
-    public EmployeeEntity updateEmployeeSalary(Long id, double newSalary) {
-        return repository.findById(id)
-                .map(employee -> {
-                    employee.setSalary(newSalary);
-                    return repository.save(employee);
-                }).orElseThrow(() -> new RuntimeException("Employee not found"));
+    public EmployeeEntity updateEmployee(Long id, EmployeeDTO newEmployee){
+        logger.info("Updated employee details.");
+        Optional<EmployeeEntity> optionalEmployee= employeeRepository.findById(id);
+        if(optionalEmployee.isPresent()){
+            EmployeeEntity existingEmployee= optionalEmployee.get();
+            existingEmployee.setName(newEmployee.getName());
+            existingEmployee.setSalary(newEmployee.getSalary());
+            return employeeRepository.save(existingEmployee);
+        }
+        return null;
     }
 }

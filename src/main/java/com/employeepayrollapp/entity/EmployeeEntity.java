@@ -1,31 +1,30 @@
 package com.employeepayrollapp.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "employee_entity")
 public class EmployeeEntity {
-
-    // UC1 --------------------------- starts here
-
+    public static final Logger logger= LoggerFactory.getLogger(EmployeeEntity.class);
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "name")
     private String name;
-
-    @Column(name = "department")
     private String department;
-
-    @Column(name = "salary")
     private double salary;
 
+    //default constructor
+    public EmployeeEntity() {}
+
+    //parameterized constructor
+    public EmployeeEntity(Long id, String name, String department, double salary) {
+        this.id = id;
+        this.name = name;
+        this.department = department;
+        this.salary = salary;
+    }
     // Getters and Setters
     public Long getId() {
         return id;
