@@ -16,47 +16,55 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class EmployeeController {
 
-    // UC1 - DTO ----------------------------- starts here
-
-    public static final Logger logger= LoggerFactory.getLogger(EmployeeController.class);
+    public static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
-    public EmployeeService employeeService;
+    private EmployeeService employeeService;
+
+    // Add new Data
     @PostMapping
-    public ResponseEntity<?> addEmployees(@RequestBody EmployeeDTO employee){
+    public ResponseEntity<?> addEmployees(@RequestBody EmployeeDTO employee) {
         logger.info("Adding a new employee: {}", employee.getName());
-        EmployeeEntity saveEmployee= employeeService.saveEmployees(employee);
-        return ResponseEntity.ok(new EmployeeDTO(saveEmployee));
+        EmployeeEntity savedEmployee = employeeService.saveEmployees(employee);
+        return ResponseEntity.ok(new EmployeeDTO(savedEmployee)); // Use the constructor here
     }
+
+    // For displaying all details
     @GetMapping
-    public ResponseEntity<List<EmployeeEntity>> getAllEmployees(){
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
         logger.info("Get all employee details");
-        List<EmployeeEntity> getEmployees=  employeeService.getAllEmployees();
-        List<EmployeeDTO> getEmployeeDetails= new ArrayList<>();
-        for(EmployeeEntity entity: getEmployees){
-            getEmployeeDetails.add(new EmployeeDTO(entity));
+        List<EmployeeEntity> employees = employeeService.getAllEmployees();
+        List<EmployeeDTO> employeeDTOs = new ArrayList<>();
+        for (EmployeeEntity entity : employees) {
+            employeeDTOs.add(new EmployeeDTO(entity)); // Convert EmployeeEntity to EmployeeDTO
         }
-        return ResponseEntity.ok(getEmployees);
+        return ResponseEntity.ok(employeeDTOs);
     }
+
+    // get mapping by id
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
         logger.info("Get employee details by id: {}", id);
-        Optional<EmployeeEntity> getEmployee = employeeService.getEmployeeById(id);
-        if(getEmployee.isPresent()){
-            return ResponseEntity.ok(new EmployeeDTO(getEmployee.get()));
+        Optional<EmployeeEntity> employee = employeeService.getEmployeeById(id);
+        if (employee.isPresent()) {
+            return ResponseEntity.ok(new EmployeeDTO(employee.get())); // Use the constructor here
         }
         return ResponseEntity.notFound().build();
     }
+
+    // Delete Mapping to delete body
     @DeleteMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> deleteEmployee(@PathVariable Long id){
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         logger.info("Delete employee.");
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Put mapping to update details
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO){
-        logger.info("Updated employee details.");
-        EmployeeEntity updateEmployee= employeeService.updateEmployee(id, employeeDTO);
-        return ResponseEntity.ok(new EmployeeDTO(updateEmployee));
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+        logger.info("Update employee details.");
+        EmployeeEntity updatedEmployee = employeeService.updateEmployee(id, employeeDTO);
+        return ResponseEntity.ok(new EmployeeDTO(updatedEmployee)); // Use the constructor here
     }
 }

@@ -11,18 +11,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-// UC2- service Layer is added according to this question
-
+// UC1 - Lombok Library---------------------- we are using lombok here
 @Service
 public class EmployeeService {
 
-    // UC1-DTO ---------------------------- starts here
-    public static final Logger logger= LoggerFactory.getLogger(EmployeeService.class);
-    //dependency injection
+    public static final Logger logger = LoggerFactory.getLogger(EmployeeService.class);
+
     @Autowired
-    public EmployeeRepository employeeRepository;
-    //save employees
-    public EmployeeEntity saveEmployees(EmployeeDTO employee){
+    private EmployeeRepository employeeRepository;
+
+    public EmployeeEntity saveEmployees(EmployeeDTO employee) {
         EmployeeEntity emp = new EmployeeEntity();
         emp.setName(employee.getName());
         emp.setSalary(employee.getSalary());
@@ -30,24 +28,27 @@ public class EmployeeService {
 
         return employeeRepository.save(emp);
     }
-    //list of employees
-    public List<EmployeeEntity> getAllEmployees(){
+
+    public List<EmployeeEntity> getAllEmployees() {
         logger.info("Getting all employees");
         return employeeRepository.findAll();
     }
-    public Optional<EmployeeEntity> getEmployeeById(Long id){
+
+    public Optional<EmployeeEntity> getEmployeeById(Long id) {
         logger.info("Get employee details by id: {}", id);
         return employeeRepository.findById(id);
     }
-    public void deleteEmployee(Long id){
+
+    public void deleteEmployee(Long id) {
         logger.info("Delete employee.");
         employeeRepository.deleteById(id);
     }
-    public EmployeeEntity updateEmployee(Long id, EmployeeDTO newEmployee){
-        logger.info("Updated employee details.");
-        Optional<EmployeeEntity> optionalEmployee= employeeRepository.findById(id);
-        if(optionalEmployee.isPresent()){
-            EmployeeEntity existingEmployee= optionalEmployee.get();
+
+    public EmployeeEntity updateEmployee(Long id, EmployeeDTO newEmployee) {
+        logger.info("Updating employee details.");
+        Optional<EmployeeEntity> optionalEmployee = employeeRepository.findById(id);
+        if (optionalEmployee.isPresent()) {
+            EmployeeEntity existingEmployee = optionalEmployee.get();
             existingEmployee.setName(newEmployee.getName());
             existingEmployee.setSalary(newEmployee.getSalary());
             return employeeRepository.save(existingEmployee);
