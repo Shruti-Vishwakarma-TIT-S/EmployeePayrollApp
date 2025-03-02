@@ -1,0 +1,18 @@
+# Production Profile Properties
+spring.config.activate.on-profile=production
+
+# Production logging configuration
+logging.level.root=WARN
+# Set WARN level for root logging in Production
+logging.level.org.springframework.web=WARN
+ # Set WARN level for Spring Web
+logging.level.com.employeepayrollapp=WARN
+# Minimal logging for the application
+
+# Enable file logging for Production
+logging.file.name=logs/prod-app.log
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %p - %m%n
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} - %p - %m%n
+
+# Database configuration (Production specific DB)
+spring.datasource.url=jdbc:mysql://localhost:3306/payrollapp
