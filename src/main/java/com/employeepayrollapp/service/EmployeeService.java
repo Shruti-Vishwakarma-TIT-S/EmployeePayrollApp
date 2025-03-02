@@ -2,6 +2,7 @@ package com.employeepayrollapp.service;
 
 import com.employeepayrollapp.dto.EmployeeDTO;
 import com.employeepayrollapp.entity.EmployeeEntity;
+import com.employeepayrollapp.exception.EmployeeNotFoundException;
 import com.employeepayrollapp.repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-// Lombok automatically creates the 'log' object
 @Service
 public class EmployeeService {
 
@@ -33,19 +33,13 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    // Get employee by id
-    public Optional<EmployeeEntity> getEmployeeById(Long id) {
-        log.info("Get employee details by id: {}", id);
-        return employeeRepository.findById(id);
-    }
-
     // Delete employee
     public void deleteEmployee(Long id) {
         log.info("Delete employee.");
         employeeRepository.deleteById(id);
     }
 
-    // Update by employee
+    // Update employee details
     public EmployeeEntity updateEmployee(Long id, EmployeeDTO newEmployee) {
         log.info("Updating employee details.");
         Optional<EmployeeEntity> optionalEmployee = employeeRepository.findById(id);
@@ -55,24 +49,22 @@ public class EmployeeService {
             existingEmployee.setSalary(newEmployee.getSalary());
             return employeeRepository.save(existingEmployee);
         }
-        return null;
+        return null;  // If employee not found, return null
     }
 
-    // UC2 - LombokLibraryLogging---------------------------------
-
-    // Get employee details by department
+    // Get employees by department
     public List<EmployeeEntity> getEmployeesByDepartment(String department) {
         log.info("Fetching employees for department: {}", department);
         return employeeRepository.findByDepartment(department);
     }
 
-    // Get employee's information by salary range
+    // Get employees by salary range
     public List<EmployeeEntity> getEmployeesBySalaryRange(double minSalary, double maxSalary) {
         log.info("Fetching employees with salary between {} and {}", minSalary, maxSalary);
         return employeeRepository.findBySalaryBetween(minSalary, maxSalary);
     }
 
-    // To update employee's information by department
+    // Update employee department
     public EmployeeEntity updateEmployeeDepartment(Long id, String newDepartment) {
         log.info("Updating department for employee with id: {}", id);
         Optional<EmployeeEntity> optionalEmployee = employeeRepository.findById(id);
@@ -84,7 +76,7 @@ public class EmployeeService {
         return null;
     }
 
-    // To update employee's information partially
+    // Partially update employee salary
     public EmployeeEntity partialUpdateEmployee(Long id, double newSalary) {
         log.info("Updating salary for employee with id: {}", id);
         Optional<EmployeeEntity> optionalEmployee = employeeRepository.findById(id);
@@ -94,5 +86,15 @@ public class EmployeeService {
             return employeeRepository.save(employee);
         }
         return null;
+    }
+
+    // Get employee by ID (throws EmployeeNotFoundException if not found)
+    public EmployeeEntity getEmployeeById(Long id) {
+        Optional<EmployeeEntity> employee = employeeRepository.findById(id);
+        if (employee.isPresent()) {
+            return employee.get();
+        } else {
+            throw new EmployeeNotFoundException("Employee with ID " + id + " not found.");
+        }
     }
 }

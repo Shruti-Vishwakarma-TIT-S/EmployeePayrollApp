@@ -47,17 +47,6 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeDTOs);
     }
 
-    // Get employee by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
-        log.info("Get employee details by id: {}", id);
-        Optional<EmployeeEntity> employee = employeeService.getEmployeeById(id);
-        if (employee.isPresent()) {
-            return ResponseEntity.ok(new EmployeeDTO(employee.get()));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     // Delete employee by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
@@ -137,5 +126,13 @@ public class EmployeeController {
         }
         log.error("Failed to update salary for employee with id: {}", id);
         return ResponseEntity.notFound().build();
+    }
+
+    // UC3- Throw user friendly error-----------------
+    // Get employee by ID with validation
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
+        EmployeeEntity employee = employeeService.getEmployeeById(id);
+        return ResponseEntity.ok(new EmployeeDTO(employee));
     }
 }
