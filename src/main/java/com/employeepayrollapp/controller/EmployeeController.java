@@ -3,6 +3,7 @@ package com.employeepayrollapp.controller;
 import com.employeepayrollapp.dto.EmployeeDTO;
 import com.employeepayrollapp.entity.EmployeeEntity;
 import com.employeepayrollapp.service.EmployeeService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +12,33 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import org.springframework.web.client.RestTemplate;
+
 
 @Slf4j
 @RestController
 @RequestMapping("/api")
 public class EmployeeController {
 
-    @Autowired
     private EmployeeService employeeService;
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public EmployeeController(EmployeeService employeeService, RestTemplate restTemplate) {
+        this.employeeService = employeeService;
+        this.restTemplate = restTemplate; // Injected RestTemplate
+    }
+
+    @GetMapping("/external-api")
+    @CircuitBreaker(name = "default", fallbackMethod = "fallbackResponse")
+    public String callExternalService() {
+        // Simulating an external API call
+        return restTemplate.getForObject("http://external-service/api", String.class);
+    }
+
+    public String fallbackResponse(Exception ex) {
+        return "Fallback response due to failure!";
+    }
 
     // Add new employee with validation
     @PostMapping
